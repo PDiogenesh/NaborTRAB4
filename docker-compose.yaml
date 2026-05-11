@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - linkextractor-net
+
+  api-python:
+    build: ./api-python
+    container_name: api-python
+    environment:
+      - REDIS_HOST=redis
+      - ENABLE_CACHE=${ENABLE_CACHE:-true}
+    networks:
+      - linkextractor-net
+    depends_on:
+      - redis
+
+  api-ruby:
+    build: ./api-ruby
+    container_name: api-ruby
+    environment:
+      - REDIS_HOST=redis
+      - ENABLE_CACHE=${ENABLE_CACHE:-true}
+    networks:
+      - linkextractor-net
+    depends_on:
+      - redis
+
+  frontend:
+    build: ./www
+    container_name: frontend
+    ports:
+      - "8080:80"
+    environment:
+      - API_HOST=${API_HOST:-api-python}
+      - API_PORT=${API_PORT:-5000}
+    networks:
+      - linkextractor-net
+    depends_on:
+      - api-python
+      - api-ruby
+      - redis
+
+  locust:
+    image: locustio/locust
+    container_name: locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locust:/mnt/locust
+      - ./reports:/mnt/locust/reports
+    working_dir: /mnt/locust
+    command: -f locustfile.py --host http://frontend
+    networks:
+      - linkextractor-net
+    depends_on:
+      - frontend
+
+networks:
+  linkextractor-net:
+    driver: bridge
