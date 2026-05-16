@@ -3,6 +3,12 @@
 Projeto acadêmico de benchmarking entre as implementações **Python** e **Ruby** da aplicação [Link Extractor](https://training.play-with-docker.com/microservice-orchestration/), testadas com e sem cache Redis, sob diferentes cargas de usuários virtuais (VUs).
 
 ---
+## Integrantes
+| Pedro Diógenes
+| Erich Schlaepfer
+| Rebeca Pinheiro 
+| Matheus Vasconcelos 
+
 
 ## Sumário
 
